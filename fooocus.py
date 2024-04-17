@@ -7,7 +7,7 @@ import upyun_util
 client = Client("http://127.0.0.1:7865/")
 
 
-def generate_in_paint_mode(base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt):
+def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt):
     if mode == 0:
         # default
         in_paint_engine = "v2.6"
@@ -21,13 +21,13 @@ def generate_in_paint_mode(base_model, refiner, refiner_weight, paint_url, mask_
 
     MIN_SEED = 0
     MAX_SEED = 2 ** 63 - 1
-    generate(base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, str(random.randint(MIN_SEED, MAX_SEED)), cnt)
+    generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, str(random.randint(MIN_SEED, MAX_SEED)), cnt)
 
 
-def generate(base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, seed, cnt):
+def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, seed, cnt):
     client.predict(
         False,  # bool in 'Generate Image Grid for Each Batch' Checkbox component
-        "",  # str in 'parameter_11' Textbox component
+        prompts,  # str in 'parameter_11' Textbox component
         "unrealistic, saturated, high contrast, big nose, painting, drawing, sketch, cartoon, anime, manga, render, CG, 3d, watermark, signature, label",  # str in 'Negative Prompt' Textbox component
         ["Fooocus V2", "Fooocus Photograph"],  # List[str] in 'Selected Styles' Checkboxgroup component
         "Speed",  # str in 'Performance' Radio component
