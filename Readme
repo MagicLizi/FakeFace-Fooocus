@@ -1,3 +1,5 @@
-pip install requests
-pip install upyun
-pip install gradio_client
+pip3 install requests
+pip3 install upyun
+pip3 install gradio_client
+pip3 install uvicorn
+pip3 install fastapi

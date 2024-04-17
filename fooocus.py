@@ -6,6 +6,7 @@ import upyun_util
 
 client = Client("http://127.0.0.1:7865/")
 
+
 def generate_in_paint_mode(base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt):
     if mode == 0:
         # default
@@ -127,8 +128,8 @@ def generate(base_model, refiner, refiner_weight, paint_url, mask_url, face_url,
         data = json.loads(file_content)
         img_path = []
         for key in data:
-            img_path.append(key)
+            url = upyun_util.upload(key)
+            img_path.append(url)
+        return img_path
 
-        print(img_path)
-        upyun_util.upload(img_path[0])
 

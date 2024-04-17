@@ -26,7 +26,7 @@ async def get_face_library(page: int = 1):
 
 @app.post("/gen")
 async def gen_fooocus_result():
-    fooocus.generate_in_paint_mode("copaxTimelessxlSDXL1_v11Lightning.safetensors",
+    result = fooocus.generate_in_paint_mode("copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                    "realisticStockPhoto_v20.safetensors",
                                    0.6,
                                    "https://files.magiclizi.com/fakeface/f2.png",
@@ -34,4 +34,6 @@ async def gen_fooocus_result():
                                    "https://files.magiclizi.com/fakeface/testface.png",
                                    0,
                                    1)
+
+    return {"code": 200, "data": {result: result}}
 

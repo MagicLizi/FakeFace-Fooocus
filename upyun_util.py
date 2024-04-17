@@ -1,5 +1,7 @@
 import upyun
 from urllib.parse import quote
+import os
+
 
 up = upyun.UpYun('magiclizi', username='lizi', password='ll09280416')
 
@@ -23,10 +25,14 @@ def get_face_list(dir_name):
 
 
 def upload(file):
-    upyunurl = "/fakeface/upload/test.png"
+    path_parts = file.split(os.sep)[-2:]
+    file_name = f"{path_parts[0]}-{path_parts[1]}"
+    # print(path_parts)
+    upyunurl = f"/fakeface/upload/{file_name}"
     with open(file, 'rb') as f:
         res = up.put(upyunurl, f)
-        return "https://"
+        # print(res)
+        return "https://files.magiclizi.com" + upyunurl
 
 
 
