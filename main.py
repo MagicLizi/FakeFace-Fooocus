@@ -2,7 +2,6 @@ import upyun_util
 import fooocus
 from typing import Annotated
 from fastapi import FastAPI, Form
-from urllib.parse import unquote, urlparse
 
 app = FastAPI()
 
@@ -34,6 +33,7 @@ async def get_face_library(page: int = 1):
 
 @app.post("/swapface")
 async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()]):
+    print(f"swap_face {paint_url} {mask_url} {face_url}")
     cnt = 1
     result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
@@ -59,4 +59,3 @@ async def detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str, For
                                             1,
                                             cnt)
     return {"code": 200, "data": {"list": result}}
-
