@@ -4,7 +4,7 @@ import json
 import os
 import upyun_util
 
-client = Client("https://4ede12946d8359b4d4.gradio.live")
+client = Client("http://yiw1.dc.houdeyun.cn:64336/")
 
 
 def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt):
