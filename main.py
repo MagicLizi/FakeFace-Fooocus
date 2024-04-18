@@ -12,6 +12,12 @@ async def root():
     return {"message": "index"}
 
 
+@app.post('/test')
+async def post_t():
+    print("post t")
+    return {"message": "test"}
+
+
 @app.get("/library")
 async def get_face_library(page: int = 1):
     if page < 1:
