@@ -21,10 +21,21 @@ def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_u
 
     MIN_SEED = 0
     MAX_SEED = 2 ** 63 - 1
-    generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, str(random.randint(MIN_SEED, MAX_SEED)), cnt)
+    return generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, str(random.randint(MIN_SEED, MAX_SEED)), cnt)
 
 
 def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds, in_paint_rf, seed, cnt):
+
+    swap_face_str = "FaceSwap"
+    stop_at = 0.9
+    weight = 0.75
+
+    if face_url is None or face_url == "":
+        face_url = ""
+        swap_face_str = "ImagePrompt"
+        stop_at = 0
+        weight = 0
+
     client.predict(
         False,  # bool in 'Generate Image Grid for Each Batch' Checkbox component
         prompts,  # str in 'parameter_11' Textbox component
@@ -103,9 +114,9 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         False,  # bool in 'Save Metadata to Images' Checkbox component
         "fooocus",  # str in 'Metadata Scheme' Radio component
         face_url,  # str (filepath or URL to image) in 'Image' Image component
-        0.9,  # int | float (numeric value between 0.0 and 1.0) in 'Stop At' Slider component
-        0.75,  # int | float (numeric value between 0.0 and 2.0) in 'Weight' Slider    component
-        "FaceSwap",  # str in 'Type' Radio component
+        stop_at,  # int | float (numeric value between 0.0 and 1.0) in 'Stop At' Slider component
+        weight,  # int | float (numeric value between 0.0 and 2.0) in 'Weight' Slider    component
+        swap_face_str,  # str in 'Type' Radio component
         "",  # str (filepath or URL to image) in 'Image' Image component
         0,  # int | float (numeric value between 0.0 and 1.0) in 'Stop At' Slider component
         0,  # int | float (numeric value between 0.0 and 2.0) in 'Weight' Slider component

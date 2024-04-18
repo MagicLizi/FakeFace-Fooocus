@@ -1,7 +1,8 @@
-from fastapi import FastAPI
 import upyun_util
 import fooocus
-from fastapi import Request
+from typing import Annotated
+from fastapi import FastAPI, Form
+from urllib.parse import unquote, urlparse
 
 app = FastAPI()
 
@@ -25,17 +26,17 @@ async def get_face_library(page: int = 1):
         return {"code": 200, "data": {"list": sub_list, "total_page": total_page}}
 
 
-@app.post("/swapbg")
-async def swap_bg(request: Request):
-    print("swap_bg")
+# @app.post("/swapbg")
+# async def swap_bg(request: Request):
+#     print("swap_bg")
+
 
 @app.post("/swapface")
-async def swap_face(request: Request):
-    data = await request.json()
-    paint_url = data.paint_url
-    mask_url = data.mask_url
-    face_url = data.face_url
-    cnt = 8
+async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()]):
+    cnt = 1
+    # last_segment = face_url.split('/')[-1]
+    # decoded_segment = unquote(last_segment)
+    # print(decoded_segment)
     result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
@@ -44,16 +45,14 @@ async def swap_face(request: Request):
                                             face_url,
                                             0,
                                             cnt)
+    return {"code": 200, "data": {"list": result}}
 
 
-@app.post("/detailface")
-async def detail_face(request: Request):
-    data = await request.json()
-    paint_url = data.paint_url
-    mask_url = data.mask_url
-    face_url = data.face_url
-    cnt = 5
-    result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
+@app.post("/detail")
+async def detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()], detail_type: Annotated[str, Form()]):
+    cnt = 1
+    # detail_type 0 脸 1 手臂 2 腿 3 膝盖 4 其他
+    result = fooocus.generate_in_paint_mode("real photo", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
                                             paint_url,
@@ -61,24 +60,5 @@ async def detail_face(request: Request):
                                             face_url,
                                             1,
                                             cnt)
-
-
-@app.post("/detailarm")
-async def detail_arm(request: Request):
-    print("detail_arm")
-
-
-@app.post("/detailleg")
-async def detail_leg(request: Request):
-    print("detail_leg")
-
-
-@app.post("/detailhand")
-async def detail_hand(request: Request):
-    print("detail_hand")
-
-
-@app.post("/detailothers")
-async def detail_others(request: Request):
-    print("detail_others")
+    return {"code": 200, "data": {"list": result}}
 
