@@ -26,17 +26,9 @@ async def get_face_library(page: int = 1):
         return {"code": 200, "data": {"list": sub_list, "total_page": total_page}}
 
 
-# @app.post("/swapbg")
-# async def swap_bg(request: Request):
-#     print("swap_bg")
-
-
 @app.post("/swapface")
 async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()]):
     cnt = 1
-    # last_segment = face_url.split('/')[-1]
-    # decoded_segment = unquote(last_segment)
-    # print(decoded_segment)
     result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
