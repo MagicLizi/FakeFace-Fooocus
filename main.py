@@ -44,7 +44,7 @@ async def get_face_library(page: int = 1):
 @app.post("/swapface")
 async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()]):
     print(f"swap_face {paint_url} {mask_url} {face_url}")
-    cnt = 8
+    cnt = 2
     result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
