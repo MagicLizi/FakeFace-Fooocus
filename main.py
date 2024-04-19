@@ -21,12 +21,6 @@ async def root():
     return {"message": "index"}
 
 
-@app.post('/test')
-async def post_t():
-    print("post t")
-    return {"message": "test"}
-
-
 @app.get("/library")
 async def get_face_library(page: int = 1):
     if page < 1:
@@ -46,7 +40,7 @@ async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, 
     print(f"swap_face p {paint_url}")
     print(f"swap_face m {mask_url}")
     print(f"swap_face f {face_url}")
-    cnt = 2
+    cnt = 1
     result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
@@ -60,9 +54,13 @@ async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, 
 
 
 @app.post("/detail")
-async def detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()], detail_type: Annotated[str, Form()]):
+async def try_detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()], detail_type: Annotated[str, Form()]):
+    print(f"detail p {paint_url}")
+    print(f"detail m {mask_url}")
+    print(f"detail m {face_url}")
+    print(f"detail detail_type {detail_type}")
     cnt = 1
-    # detail_type 0 脸 1 手臂 2 腿 3 膝盖 4 其他
+    # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
     result = fooocus.generate_in_paint_mode("real photo", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
@@ -72,3 +70,10 @@ async def detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str, For
                                             1,
                                             cnt)
     return {"code": 200, "data": {"list": result}}
+
+
+@app.post('/test')
+async def post_t():
+    print("post t")
+    return {"message": "test"}
+
