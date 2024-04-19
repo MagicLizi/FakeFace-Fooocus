@@ -4,8 +4,8 @@ import json
 import os
 import upyun_util
 
-# client = Client("http://yiw1.dc.houdeyun.cn:64336/")
-client = Client("http://127.0.0.1:7865/")
+client = Client("http://yiw1.dc.houdeyun.cn:64336/")
+# client = Client("http://127.0.0.1:7865/")
 
 
 def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt):
