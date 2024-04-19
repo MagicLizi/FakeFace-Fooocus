@@ -5,8 +5,8 @@ import os
 import json
 import upyun_util
 from bs4 import BeautifulSoup
-# client = Client("http://yiw1.dc.houdeyun.cn:64336/")
-client = Client("http://127.0.0.1:7865/")
+client = Client("http://yiw1.dc.houdeyun.cn:64336/")
+# client = Client("http://127.0.0.1:7865/")
 
 deal_cache = {}
 
