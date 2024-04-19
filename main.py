@@ -56,7 +56,7 @@ async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, 
     face_name = os.path.basename(path)
     cfg = face_config[face_name]
     if cfg is not None:
-        cnt = 1
+        cnt = 4
         prompts = cfg['prompts']
         base_model = cfg['model']
         refiner_model = cfg['refiner_model']
@@ -89,7 +89,7 @@ async def try_detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str,
     face_name = os.path.basename(path)
     cfg = face_config[face_name]
     if cfg is not None:
-        cnt = 1
+        cnt = 2
         base_model = cfg['model']
         refiner_model = cfg['refiner_model']
         print(base_model)
