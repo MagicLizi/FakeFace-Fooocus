@@ -6,8 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 from urllib.parse import urlparse
 import os
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
+
+# app.mount("/", StaticFiles(directory="dist"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,6 +29,7 @@ with open("./ff.json", 'r', encoding='utf-8') as file:
         face_config[item['name']] = item
 
 print(face_config)
+
 
 @app.get('/')
 async def root():
@@ -109,9 +113,4 @@ async def try_detail(paint_url: Annotated[str, Form()], mask_url: Annotated[str,
         return {"code": 500}
 
 
-
-@app.post('/test')
-async def post_t():
-    print("post t")
-    return {"message": "test"}
 
