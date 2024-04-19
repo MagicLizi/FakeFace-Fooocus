@@ -161,18 +161,19 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         size = len(job.outputs())
         if size > 0:
             rst = job.outputs()[size - 1][0]
-            # print(rst)
-            htlm = rst['value']
-            soup = BeautifulSoup(htlm, 'lxml')
-            # 找到 progress 标签
-            progress = soup.find('progress')
-            # 获取 value 属性
-            value = progress.get('value') if progress else None
-            deal_cache[key] = {
-                "finish": False,
-                "progress": value,
-                "cnt":f"0/{cnt}"
-            }
+            print(rst)
+            if 'value' in rst:
+                htlm = rst['value']
+                soup = BeautifulSoup(htlm, 'lxml')
+                # 找到 progress 标签
+                progress = soup.find('progress')
+                # 获取 value 属性
+                value = progress.get('value') if progress else None
+                deal_cache[key] = {
+                    "finish": False,
+                    "progress": value,
+                    "cnt": f"0/{cnt}"
+                }
         time.sleep(1)
 
     size = len(job.outputs())
