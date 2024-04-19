@@ -2,8 +2,18 @@ import upyun_util
 import fooocus
 from typing import Annotated
 from fastapi import FastAPI, Form
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源，生产环境应更精确地设置
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有方法
+    allow_headers=["*"],  # 允许所有头
+)
 
 
 @app.get('/')
@@ -34,7 +44,7 @@ async def get_face_library(page: int = 1):
 @app.post("/swapface")
 async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], face_url: Annotated[str, Form()]):
     print(f"swap_face {paint_url} {mask_url} {face_url}")
-    cnt = 1
+    cnt = 2
     result = fooocus.generate_in_paint_mode("", "copaxTimelessxlSDXL1_v11Lightning.safetensors",
                                             "realisticStockPhoto_v20.safetensors",
                                             0.6,
