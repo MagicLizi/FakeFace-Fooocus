@@ -65,6 +65,23 @@ async def get_key_cache(key: str = 1):
         return {"code": 500, "data": {}}
 
 
+@app.post("/swapbg")
+async def swap_bg(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], prompts: Annotated[str, Form()]):
+    print(f"swap_face p {paint_url}")
+    print(f"swap_face m {mask_url}")
+    print(f"swap_face m {prompts}")
+    cnt = 4
+    timestamp_ms = int(time.time() * 1000)
+    chars = string.ascii_letters
+    random_string = ''.join(random.choice(chars) for _ in range(length))
+    key = f'{timestamp_ms}{random_string}'
+    fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
+    # thread = threading.Thread(target=fooocus.generate_in_paint_mode, args=(
+    # prompts, base_model, refiner_model, 0.6, paint_url, mask_url, "", 0, cnt, key))
+    # thread.start()
+    return {"code": 200, "data": {"key": key, "cnt": cnt}}
+
+
 @app.post("/swapface")
 async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()],
                     face_url: Annotated[str, Form()]):
