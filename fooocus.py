@@ -5,8 +5,8 @@ import os
 import json
 import upyun_util
 from bs4 import BeautifulSoup
-client = Client("http://yiw1.dc.houdeyun.cn:64336/")
-# client = Client("http://127.0.0.1:7865/")
+# client = Client("http://yiw1.dc.houdeyun.cn:64336/")
+client = Client("http://127.0.0.1:7865/")
 
 deal_cache = {}
 
@@ -185,10 +185,11 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         for k in data:
             url = upyun_util.upload(k)
             img_path.append(url)
-
+        print(img_path)
         deal_cache[key] = {
             "finish": True,
             "list": img_path,
+            "progress": 100,
             "cnt": f"0/{cnt}"
         }
 
