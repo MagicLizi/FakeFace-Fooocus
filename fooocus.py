@@ -9,6 +9,7 @@ client = Client("http://yiw1.dc.houdeyun.cn:64336/")
 
 
 def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt):
+    print("some one gen ")
     if mode == 0:
         # default
         in_paint_engine = "v2.6"
