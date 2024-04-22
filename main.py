@@ -104,7 +104,7 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
     print("swap_face_batch")
     targets_list = json.loads(targets)
     keys = []
-    cnt = 4
+    cnt = 1
     for target in targets_list:
         timestamp_ms = int(time.time() * 1000)
         chars = string.ascii_letters
@@ -120,7 +120,6 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
 
 @app.post("/detail_batch")
 async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], detail_type: Annotated[str, Form()]):
-    print("detail_batch")
     targets_list = json.loads(targets)
     keys = []
     cnt = 1
@@ -134,9 +133,11 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
         keys.append(key)
         # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
     need_face = False
+    out_prompts = "real photo"
     if detail_type == 2:
         need_face = True
-    thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 1, "real photo", need_face))
+        out_prompts = None
+    thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 1, out_prompts, need_face))
     thread.start()
     return {"code": 200, "data": {"keys": keys}}
 
