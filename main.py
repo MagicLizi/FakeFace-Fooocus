@@ -104,7 +104,7 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
     print("swap_face_batch")
     targets_list = json.loads(targets)
     keys = []
-    cnt = 1
+    cnt = 4
     for target in targets_list:
         timestamp_ms = int(time.time() * 1000)
         chars = string.ascii_letters
