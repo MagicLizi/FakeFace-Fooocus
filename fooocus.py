@@ -9,11 +9,13 @@ from bs4 import BeautifulSoup
 client = Client("http://127.0.0.1:7865/")
 
 deal_cache = {}
+in_use = False
 
 
 def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt,
                            key):
-    print("some one gen ")
+    in_use = True
+    # print("some one gen ")
     if mode == 0:
         # default
         in_paint_engine = "v2.6"
@@ -161,7 +163,7 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         size = len(job.outputs())
         if size > 0:
             rst = job.outputs()[size - 1][0]
-            print(rst)
+            # print(rst)
             if 'value' in rst:
                 htlm = rst['value']
                 soup = BeautifulSoup(htlm, 'lxml')
@@ -178,6 +180,8 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
 
     size = len(job.outputs())
 
+    # print(paint_url)
+    # print(job.outputs()[size - 1])
     full_path = os.path.join(job.outputs()[size - 1][3], "captions.json")
     with open(full_path, 'r') as file:
         file_content = file.read()
@@ -193,4 +197,5 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
             "progress": 100,
             "cnt": f"0/{cnt}"
         }
+        in_use = False
 
