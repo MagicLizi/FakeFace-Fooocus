@@ -1,8 +1,9 @@
 import upyun_util
 import fooocus
 from typing import Annotated
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 import json
 from urllib.parse import urlparse
 import os
@@ -10,13 +11,18 @@ import threading
 import time
 import random
 import string
-
+import jwt
+JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 length = 10
+face_config = {}
+with open("./ff.json", 'r', encoding='utf-8') as file:
+    # 解析文件内容到Python数据结构
+    data = json.load(file)
+    for item in data:
+        face_config[item['name']] = item
 
 app = FastAPI()
-
-# app.mount("/", StaticFiles(directory="dist"), name="static")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 允许所有来源，生产环境应更精确地设置
@@ -25,24 +31,42 @@ app.add_middleware(
     allow_headers=["*"],  # 允许所有头
 )
 
-face_config = {}
 
-with open("./ff.json", 'r', encoding='utf-8') as file:
-    # 解析文件内容到Python数据结构
-    data = json.load(file)
-    for item in data:
-        face_config[item['name']] = item
+def decode_jwt(token: str):
+    try:
+        decoded_jwt = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return decoded_jwt
+    except:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
-print(face_config)
+
+@app.post('/login')
+async def login(mobile: Annotated[str, Form()]):
+    with open("./user.json", 'r', encoding='utf-8') as file:
+        # 解析文件内容到Python数据结构
+        data = json.load(file)
+        if mobile in data:
+            jwt_token = jwt.encode({"user": mobile, "time_stamp": int(time.time())}, JWT_SECRET, algorithm="HS256")
+            return {"code": 200, "token": jwt_token}
+        else:
+            return {"code": 500}
 
 
 @app.get('/')
-async def root():
-    return {"message": "index"}
+async def root(token: str = Depends(oauth2_scheme)):
+    user = decode_jwt(token)
+    return {"message": "index", "user": user}
+
+
+@app.get('/check_in_use')
+async def in_use():
+    return {"code": 200, "data": {
+        "in_use": fooocus.in_use
+    }}
 
 
 @app.get("/library")
-async def get_face_library(page: int = 1):
+async def get_face_library(page: int = 1, token: str = Depends(oauth2_scheme)):
     if page < 1:
         return {"code": 500, "msg": "page Error Must >= 1"}
     else:
@@ -66,7 +90,7 @@ async def get_key_cache(key: str = 1):
 
 
 @app.get("/keys")
-async def get_keys(keys: str):
+async def get_keys(keys: str, token: str = Depends(oauth2_scheme)):
     key_list = json.loads(keys)
     ret_list = []
     for key in key_list:
@@ -100,49 +124,70 @@ async def swap_bg(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Fo
 
 
 @app.post("/swap_face_batch")
-async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()]):
+async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
     print("swap_face_batch")
-    targets_list = json.loads(targets)
-    keys = []
-    cnt = 1
-    for target in targets_list:
-        timestamp_ms = int(time.time() * 1000)
-        chars = string.ascii_letters
-        random_string = ''.join(random.choice(chars) for _ in range(length))
-        key = f'{timestamp_ms}{random_string}'
-        target["key"] = key
-        fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
-        keys.append(key)
-    thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 0, None, True))
-    thread.start()
-    return {"code": 200, "data": {"keys": keys}}
+    user = decode_jwt(token)
+    user_key = user["user"]
+    with open("./user.json", 'r', encoding='utf-8') as file:
+        # 解析文件内容到Python数据结构
+        data = json.load(file)
+        if user_key in data:
+            rst = data[user_key]
+            client = rst['client']
+            targets_list = json.loads(targets)
+            keys = []
+            cnt = 1
+            for target in targets_list:
+                timestamp_ms = int(time.time() * 1000)
+                chars = string.ascii_letters
+                random_string = ''.join(random.choice(chars) for _ in range(length))
+                key = f'{timestamp_ms}{random_string}'
+                target["key"] = key
+                fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
+                keys.append(key)
+            thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 0, None, True, client))
+            thread.start()
+            return {"code": 200, "data": {"keys": keys}}
+        else:
+            return {"code": 500, "data": {}}
 
 
 @app.post("/detail_batch")
-async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], detail_type: Annotated[str, Form()]):
-    targets_list = json.loads(targets)
-    keys = []
-    cnt = 1
-    for target in targets_list:
-        timestamp_ms = int(time.time() * 1000)
-        chars = string.ascii_letters
-        random_string = ''.join(random.choice(chars) for _ in range(length))
-        key = f'{timestamp_ms}{random_string}'
-        target["key"] = key
-        fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
-        keys.append(key)
-        # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
-    need_face = False
-    out_prompts = "real photo"
-    if detail_type == 2:
-        need_face = True
-        out_prompts = None
-    thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 1, out_prompts, need_face))
-    thread.start()
-    return {"code": 200, "data": {"keys": keys}}
+async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], detail_type: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
+    print("detail_batch")
+    user = decode_jwt(token)
+    user_key = user["user"]
+    with open("./user.json", 'r', encoding='utf-8') as file:
+        # 解析文件内容到Python数据结构
+        data = json.load(file)
+        if user_key in data:
+            rst = data[user_key]
+            client = rst['client']
+            targets_list = json.loads(targets)
+            keys = []
+            cnt = 1
+            for target in targets_list:
+                timestamp_ms = int(time.time() * 1000)
+                chars = string.ascii_letters
+                random_string = ''.join(random.choice(chars) for _ in range(length))
+                key = f'{timestamp_ms}{random_string}'
+                target["key"] = key
+                fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
+                keys.append(key)
+                # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
+            need_face = False
+            out_prompts = "real photo"
+            if detail_type == 2:
+                need_face = True
+                out_prompts = None
+            thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 1, out_prompts, need_face, client))
+            thread.start()
+            return {"code": 200, "data": {"keys": keys}}
+        else:
+            return {"code": 500, "data": {}}
 
 
-def batch(targets_list, face_url, cnt, mode, out_prompts, need_face):
+def batch(targets_list, face_url, cnt, mode, out_prompts, need_face, client):
     for target in targets_list:
         paint_url = target['pic_url']
         mask_url = target['mask_url']
@@ -166,7 +211,9 @@ def batch(targets_list, face_url, cnt, mode, out_prompts, need_face):
             print(base_model)
             print(refiner_model)
             print(key)
-            fooocus.generate_in_paint_mode(prompts, base_model, refiner_model, 0.6, paint_url, mask_url, face_url, mode, cnt, key)
+            print(client)
+            fooocus.generate_in_paint_mode(prompts, base_model, refiner_model, 0.6, paint_url, mask_url,
+                                           face_url, mode, cnt, key, client)
         else:
             print(f"cfg not exist {face_name}")
 

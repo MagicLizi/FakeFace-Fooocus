@@ -5,15 +5,14 @@ import os
 import json
 import upyun_util
 from bs4 import BeautifulSoup
-client = Client("http://yiw1.dc.houdeyun.cn:64336/")
-# client = Client("http://127.0.0.1:7865/")
 
 deal_cache = {}
+clients = {}
 in_use = False
 
 
 def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, mode, cnt,
-                           key):
+                           key, client_key):
     in_use = True
     # print("some one gen ")
     if mode == 0:
@@ -30,11 +29,16 @@ def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_u
     MIN_SEED = 0
     MAX_SEED = 2 ** 63 - 1
     generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds,
-             in_paint_rf, str(random.randint(MIN_SEED, MAX_SEED)), cnt, key)
+             in_paint_rf, str(random.randint(MIN_SEED, MAX_SEED)), cnt, key, client_key)
 
 
 def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds,
-             in_paint_rf, seed, cnt, key):
+             in_paint_rf, seed, cnt, key, client_key):
+
+    if client_key not in clients:
+        clients[client_key] = Client(client_key)
+
+    client = clients[client_key]
     swap_face_str = "FaceSwap"
     stop_at = 0.9
     weight = 0.75
