@@ -5,7 +5,7 @@ import os
 import json
 import upyun_util
 from bs4 import BeautifulSoup
-
+from logger_mgr import log
 deal_cache = {}
 clients = {}
 in_use = False
@@ -35,13 +35,21 @@ def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_u
 def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds,
              in_paint_rf, seed, cnt, key, client_key):
 
-    print(f"prompts {prompts}")
-    print(f"base_model {base_model}")
-    print(f"refiner {refiner}")
-    print(f"paint_url {paint_url}")
-    print(f"mask_url {mask_url}")
-    print(f"face_url {face_url}")
-    print("----------------------------------")
+    log(f"prompts {prompts}")
+    log(f"base_model {base_model}")
+    log(f"refiner {refiner}")
+    log(f"refiner_weight {refiner_weight}")
+    log(f"paint_url {paint_url}")
+    log(f"mask_url {mask_url}")
+    log(f"face_url {face_url}")
+    log(f"in_paint_engine {in_paint_engine}")
+    log(f"in_paint_ds {in_paint_ds}")
+    log(f"in_paint_rf {in_paint_rf}")
+    log(f"seed {seed}")
+    log(f"cnt {cnt}")
+    log(f"key {key}")
+    log(f"client_key {client_key}")
+    log("----------------------------------")
     if client_key not in clients:
         clients[client_key] = Client(client_key)
 

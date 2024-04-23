@@ -14,6 +14,8 @@ import string
 import jwt
 import math
 import azure
+from logger_mgr import log
+
 
 JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -64,6 +66,7 @@ async def root():
     # rst_list = upyun_util.get_face_list("/fakeface/face")
     # print(len(rst_list))
     rst = azure.translate("你好,我好")
+    log(rst)
     return {"message": rst}
 
 
@@ -127,13 +130,13 @@ async def get_bg_conf(token: str = Depends(oauth2_scheme)):
 
 @app.post("/swap_bg_batch")
 async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str, Form()], custom_p: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
-    print("swap_bg_batch")
-    print(targets)
-    print(select_p)
-    print(custom_p)
+    log("swap_bg_batch")
+    log(targets)
+    log(select_p)
+    log(custom_p)
     if custom_p != "none":
         rst = azure.translate(custom_p)
-        print(f"需要翻译 {custom_p} to {rst}")
+        log(f"需要翻译 {custom_p} to {rst}")
         select_p = f"{select_p},{rst}"
     user = decode_jwt(token)
     user_key = user["user"]
@@ -163,7 +166,9 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
 
 @app.post("/swap_face_batch")
 async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
-    print("swap_face_batch")
+    log("swap_face_batch")
+    log(f"face_url {face_url}")
+    log(f"targets {targets}")
     user = decode_jwt(token)
     user_key = user["user"]
     with open("./user.json", 'r', encoding='utf-8') as file:
@@ -192,7 +197,11 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
 
 @app.post("/detail_batch")
 async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], detail_type: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
-    print(f"detail_batch {detail_type}")
+    log("detail_batch")
+    log(f"face_url {face_url}")
+    log(f"targets {targets}")
+    log(f"detail_type {detail_type}")
+
     user = decode_jwt(token)
     user_key = user["user"]
     with open("./user.json", 'r', encoding='utf-8') as file:
@@ -236,9 +245,9 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
 
 
 def batch(targets_list, face_url, cnt, mode, out_prompts, need_face, client):
-    print(f"out_prompts {out_prompts}")
-    print(f"need_face {need_face}")
-    print(f"mode {mode}")
+    log(f"mode {mode}")
+    log(f"out_prompts {out_prompts}")
+    log(f"need_face {need_face}")
     for target in targets_list:
         paint_url = target['pic_url']
         mask_url = target['mask_url']
