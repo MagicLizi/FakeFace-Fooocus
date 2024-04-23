@@ -12,6 +12,7 @@ import time
 import random
 import string
 import jwt
+import math
 JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 length = 10
@@ -54,9 +55,10 @@ async def login(mobile: Annotated[str, Form()]):
 
 
 @app.get('/')
-async def root(token: str = Depends(oauth2_scheme)):
-    user = decode_jwt(token)
-    return {"message": "index", "user": user}
+async def root():
+    # rst_list = upyun_util.get_face_list("/fakeface/face")
+    # print(len(rst_list))
+    return {"message": "index"}
 
 
 @app.get('/check_in_use')
@@ -73,7 +75,7 @@ async def get_face_library(page: int = 1, token: str = Depends(oauth2_scheme)):
     else:
         rst_list = upyun_util.get_face_list("/fakeface/face")
         page_cnt = 30
-        total_page = int(len(rst_list) / page_cnt)
+        total_page = math.ceil(len(rst_list) / page_cnt)
         start = (page - 1) * page_cnt
         end = start + page_cnt
         sub_list = rst_list[start:end]
