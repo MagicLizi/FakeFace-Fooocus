@@ -187,7 +187,7 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
 
 @app.post("/detail_batch")
 async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], detail_type: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
-    print("detail_batch")
+    print(f"detail_batch {detail_type}")
     user = decode_jwt(token)
     user_key = user["user"]
     with open("./user.json", 'r', encoding='utf-8') as file:
@@ -230,6 +230,9 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
 
 
 def batch(targets_list, face_url, cnt, mode, out_prompts, need_face, client):
+    print(f"out_prompts {out_prompts}")
+    print(f"need_face {need_face}")
+    print(f"mode {mode}")
     for target in targets_list:
         paint_url = target['pic_url']
         mask_url = target['mask_url']
