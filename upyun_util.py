@@ -19,7 +19,7 @@ def get_face_list(dir_name):
         else:
             list.append({
                 'name': name,
-                'url': f'https://files.magiclizi.com/{dir_name}/{quote(name)}'
+                'url': f'https://files.magiclizi.com{dir_name}/{quote(name)}'
             })
     return list
 
