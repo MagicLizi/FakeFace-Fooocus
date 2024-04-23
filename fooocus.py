@@ -186,7 +186,9 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
 
     # print(paint_url)
     # print(job.outputs()[size - 1])
-    full_path = os.path.join(job.outputs()[size - 1][3], "captions.json")
+    path = job.outputs()[size - 1][3]
+    print(path)
+    full_path = os.path.join(path, "captions.json")
     with open(full_path, 'r') as file:
         file_content = file.read()
         data = json.loads(file_content)
