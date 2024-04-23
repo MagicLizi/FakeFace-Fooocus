@@ -16,6 +16,7 @@ JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 length = 10
 face_config = {}
+default_face =  "https://files.magiclizi.com/default.png"
 with open("./ff.json", 'r', encoding='utf-8') as file:
     # 解析文件内容到Python数据结构
     data = json.load(file)
@@ -123,7 +124,6 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
     print(custom_p)
     if custom_p != "none":
         print("需要翻译")
-    bg_face_url = "https://files.magiclizi.com/custom_bg.png"
     user = decode_jwt(token)
     user_key = user["user"]
     with open("./user.json", 'r', encoding='utf-8') as file:
@@ -143,7 +143,7 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
                 target["key"] = key
                 fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
                 keys.append(key)
-            thread = threading.Thread(target=batch, args=(targets_list, bg_face_url, cnt, 0, select_p, False, client))
+            thread = threading.Thread(target=batch, args=(targets_list, default_face, cnt, 0, select_p, False, client))
             thread.start()
             return {"code": 200, "data": {"keys": keys}}
         else:
@@ -201,13 +201,21 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
                 target["key"] = key
                 fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
                 keys.append(key)
-                # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
+            # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
             need_face = False
             out_prompts = "real photo"
             if detail_type == 2:
                 need_face = True
                 out_prompts = None
-            thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, 1, out_prompts, need_face, client))
+                mode = 1
+            if detail_type == 3 or detail_type == 4:
+                mode = 1
+                face_url = default_face
+            if detail_type == 5 or detail_type == 6:
+                mode = 0
+                face_url = default_face
+
+            thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, mode, out_prompts, need_face, client))
             thread.start()
             return {"code": 200, "data": {"keys": keys}}
         else:
