@@ -106,21 +106,48 @@ async def get_keys(keys: str, token: str = Depends(oauth2_scheme)):
     return {"code": 200, "data": {"list": ret_list}}
 
 
-@app.post("/swapbg")
-async def swap_bg(paint_url: Annotated[str, Form()], mask_url: Annotated[str, Form()], prompts: Annotated[str, Form()]):
-    print(f"swap_face p {paint_url}")
-    print(f"swap_face m {mask_url}")
-    print(f"swap_face m {prompts}")
-    cnt = 4
-    timestamp_ms = int(time.time() * 1000)
-    chars = string.ascii_letters
-    random_string = ''.join(random.choice(chars) for _ in range(length))
-    key = f'{timestamp_ms}{random_string}'
-    fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
-    # thread = threading.Thread(target=fooocus.generate_in_paint_mode, args=(
-    # prompts, base_model, refiner_model, 0.6, paint_url, mask_url, "", 0, cnt, key))
-    # thread.start()
-    return {"code": 200, "data": {"key": key, "cnt": cnt}}
+@app.get("/bg_prompts_conf")
+async def get_bg_conf(token: str = Depends(oauth2_scheme)):
+    user = decode_jwt(token)
+    with open("./bg_prompts.json", 'r', encoding='utf-8') as file:
+        # 解析文件内容到Python数据结构
+        data = json.load(file)
+        return {"code": 200, "data": data}
+
+
+@app.post("/swap_bg_batch")
+async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str, Form()], custom_p: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
+    print("swap_bg_batch")
+    print(targets)
+    print(select_p)
+    print(custom_p)
+    if custom_p != "none":
+        print("需要翻译")
+    bg_face_url = "https://files.magiclizi.com/custom_bg.png"
+    user = decode_jwt(token)
+    user_key = user["user"]
+    with open("./user.json", 'r', encoding='utf-8') as file:
+        # 解析文件内容到Python数据结构
+        data = json.load(file)
+        if user_key in data:
+            rst = data[user_key]
+            client = rst['client']
+            targets_list = json.loads(targets)
+            keys = []
+            cnt = 6
+            for target in targets_list:
+                timestamp_ms = int(time.time() * 1000)
+                chars = string.ascii_letters
+                random_string = ''.join(random.choice(chars) for _ in range(length))
+                key = f'{timestamp_ms}{random_string}'
+                target["key"] = key
+                fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
+                keys.append(key)
+            thread = threading.Thread(target=batch, args=(targets_list, bg_face_url, cnt, 0, select_p, False, client))
+            thread.start()
+            return {"code": 200, "data": {"keys": keys}}
+        else:
+            return {"code": 500, "data": {}}
 
 
 @app.post("/swap_face_batch")
@@ -136,7 +163,7 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
             client = rst['client']
             targets_list = json.loads(targets)
             keys = []
-            cnt = 1
+            cnt = 4
             for target in targets_list:
                 timestamp_ms = int(time.time() * 1000)
                 chars = string.ascii_letters
@@ -165,7 +192,7 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
             client = rst['client']
             targets_list = json.loads(targets)
             keys = []
-            cnt = 1
+            cnt = 2
             for target in targets_list:
                 timestamp_ms = int(time.time() * 1000)
                 chars = string.ascii_letters
