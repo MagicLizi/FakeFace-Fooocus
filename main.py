@@ -137,7 +137,7 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
     if custom_p != "none":
         rst = azure.translate(custom_p)
         log(f"需要翻译 {custom_p} to {rst}")
-        select_p = f"{select_p},{rst}"
+        select_p = f"{select_p}{rst}"
     user = decode_jwt(token)
     user_key = user["user"]
     with open("./user.json", 'r', encoding='utf-8') as file:
