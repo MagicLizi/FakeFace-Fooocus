@@ -13,6 +13,8 @@ import random
 import string
 import jwt
 import math
+import azure
+
 JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 length = 10
@@ -61,7 +63,8 @@ async def login(mobile: Annotated[str, Form()]):
 async def root():
     # rst_list = upyun_util.get_face_list("/fakeface/face")
     # print(len(rst_list))
-    return {"message": "index"}
+    rst = azure.translate("你好,我好")
+    return {"message": rst}
 
 
 @app.get('/check_in_use')
@@ -129,7 +132,9 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
     print(select_p)
     print(custom_p)
     if custom_p != "none":
-        print("需要翻译")
+        rst = azure.translate(custom_p)
+        print(f"需要翻译 {custom_p} to {rst}")
+        select_p = f"{select_p},{rst}"
     user = decode_jwt(token)
     user_key = user["user"]
     with open("./user.json", 'r', encoding='utf-8') as file:
