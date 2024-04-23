@@ -1,7 +1,7 @@
 [
   {"title": "人种", "list": [{"name": "亚洲人", "value": "Asian"},{"name": "白种人", "value": "Caucasian"},{"name": "黑人", "value": "Black person"}]},
   {"title": "阳光情况", "list": [{"name": "阳光", "value": "Sunshine"},{"name": "阴天", "value": "Cloudy"},{"name": "昏暗", "value": "Dim"}]},
+  {"title": "长短袖", "list": [{"name": "长袖", "value": "Long Sleeves"},{"name": "短袖", "value": "Short Sleeves"}]},
   {"title": "性别", "list": [{"name": "男", "value": "Male"},{"name": "女", "value": "Female"}]},
-  {"title": "室内外", "list": [{"name": "室内", "value": "Indoors"},{"name": "室外", "value": "Outdoors"}]},
-  {"title": "是否棚拍", "list": [{"name": "棚拍", "value": "white background"},{"name": "室外", "value": ""}]}
+  {"title": "室内外", "list": [{"name": "室内", "value": "Indoors"},{"name": "室外", "value": "Outdoors"},{"name": "棚拍（纯净背景）", "value": "white background"}]}
 ]
