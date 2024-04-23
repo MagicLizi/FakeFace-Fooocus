@@ -202,7 +202,7 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
     # print(paint_url)
     # print(job.outputs()[size - 1])
     path = job.outputs()[size - 1][3]
-    print(path)
+    log(f"file_path {path}")
     full_path = os.path.join(path, "captions.json")
     with open(full_path, 'r') as file:
         file_content = file.read()
@@ -211,7 +211,7 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         for k in data:
             url = upyun_util.upload(k)
             img_path.append(url)
-        print(img_path)
+        log(f"gen success: {img_path}")
         deal_cache[key] = {
             "finish": True,
             "list": img_path,
