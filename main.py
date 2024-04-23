@@ -206,6 +206,7 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
             # detail_type 2 脸 3 手臂 4 腿 5 手 6 其他
             need_face = False
             out_prompts = "real photo"
+            mode = 0
             if detail_type == 2:
                 need_face = True
                 out_prompts = None
