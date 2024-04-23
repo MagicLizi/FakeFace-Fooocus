@@ -32,6 +32,9 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有方法
     allow_headers=["*"],  # 允许所有头
 )
+import logging
+logging.getLogger('uvicorn').setLevel(logging.CRITICAL)
+logging.getLogger('uvicorn.access').setLevel(logging.CRITICAL)
 
 
 def decode_jwt(token: str):
@@ -79,7 +82,7 @@ async def get_face_library(page: int = 1, token: str = Depends(oauth2_scheme)):
         start = (page - 1) * page_cnt
         end = start + page_cnt
         sub_list = rst_list[start:end]
-        print(sub_list)
+        # print(sub_list)
         return {"code": 200, "data": {"list": sub_list, "total_page": total_page}}
 
 
