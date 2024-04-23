@@ -14,14 +14,15 @@ import string
 import jwt
 import math
 import azure
+import logging
+logging.getLogger('uvicorn').setLevel(logging.CRITICAL)
+logging.getLogger('uvicorn.access').setLevel(logging.CRITICAL)
 from logger_mgr import log
-
-
 JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 length = 10
 face_config = {}
-default_face =  "https://files.magiclizi.com/default.png"
+default_face = "https://files.magiclizi.com/default.png"
 with open("./ff.json", 'r', encoding='utf-8') as file:
     # 解析文件内容到Python数据结构
     data = json.load(file)
@@ -36,9 +37,6 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有方法
     allow_headers=["*"],  # 允许所有头
 )
-import logging
-logging.getLogger('uvicorn').setLevel(logging.CRITICAL)
-logging.getLogger('uvicorn.access').setLevel(logging.CRITICAL)
 
 
 def decode_jwt(token: str):
@@ -65,9 +63,13 @@ async def login(mobile: Annotated[str, Form()]):
 async def root():
     # rst_list = upyun_util.get_face_list("/fakeface/face")
     # print(len(rst_list))
-    rst = azure.translate("你好,我好")
-    log(rst)
-    return {"message": rst}
+    # rst = azure.translate("你好,我好")
+    return {"message": "rst"}
+
+
+@app.get('/timeout')
+async def timeout():
+    return {"message": "sleepend"}
 
 
 @app.get('/check_in_use')
