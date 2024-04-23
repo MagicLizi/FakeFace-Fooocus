@@ -6,4 +6,4 @@ pip3 install fastapi
 pip3 install beautifulsoup4
 pip3 install lxml
 pip3 install pyjwt
-pip3 install celery
+pip3 install celery[librabbitmq,redis,msgpack,gevent]
