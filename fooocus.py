@@ -35,6 +35,13 @@ def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_u
 def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, face_url, in_paint_engine, in_paint_ds,
              in_paint_rf, seed, cnt, key, client_key):
 
+    print(f"prompts {prompts}")
+    print(f"base_model {base_model}")
+    print(f"refiner {refiner}")
+    print(f"paint_url {paint_url}")
+    print(f"mask_url {mask_url}")
+    print(f"face_url {face_url}")
+    print("----------------------------------")
     if client_key not in clients:
         clients[client_key] = Client(client_key)
 
