@@ -131,17 +131,28 @@ async def get_bg_conf(token: str = Depends(oauth2_scheme)):
 
 
 @app.post("/swap_bg_batch")
-async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str, Form()], custom_p: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
+async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str, Form()], custom_p: Annotated[str, Form()], is_static: Annotated[bool, Form()], token: str = Depends(oauth2_scheme)):
     log("swap_bg_batch")
-    log(targets)
-    log(select_p)
-    log(custom_p)
-    if custom_p != "none":
-        rst = azure.translate(custom_p)
-        log(f"需要翻译 {custom_p} to {rst}")
-        select_p = f"{select_p},{rst}"
+    log(f"targets {targets}")
+    log(f"select_p {select_p}")
+    log(f"custom_p {custom_p}")
+    log(f"is_static {is_static}")
     user = decode_jwt(token)
     user_key = user["user"]
+    prompts = select_p
+    if custom_p != "none":
+        log(f"需要翻译 {custom_p}")
+        custom_p = azure.translate(custom_p)
+        log(f"翻译结果 {custom_p}")
+        prompts = f"{prompts},{custom_p}"
+    else:
+        custom_p = ""
+
+    mode = 0
+    if is_static:
+        mode = 2
+        prompts = custom_p
+    log(f"最终mode {mode} prompts {prompts}")
     with open("./user.json", 'r', encoding='utf-8') as file:
         # 解析文件内容到Python数据结构
         data = json.load(file)
@@ -159,7 +170,7 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
                 target["key"] = key
                 fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
                 keys.append(key)
-            thread = threading.Thread(target=batch, args=(targets_list, default_face, cnt, 0, select_p, False, client))
+            thread = threading.Thread(target=batch, args=(targets_list, default_face, cnt, mode, prompts, False, client))
             thread.start()
             return {"code": 200, "data": {"keys": keys}}
         else:
@@ -181,7 +192,7 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
             client = rst['client']
             targets_list = json.loads(targets)
             keys = []
-            cnt = 4
+            cnt = 1
             for target in targets_list:
                 timestamp_ms = int(time.time() * 1000)
                 chars = string.ascii_letters

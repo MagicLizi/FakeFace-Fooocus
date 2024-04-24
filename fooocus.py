@@ -20,10 +20,14 @@ def generate_in_paint_mode(prompts, base_model, refiner, refiner_weight, paint_u
         in_paint_engine = "v2.6"
         in_paint_ds = 1
         in_paint_rf = 0.618
-    else:
+    elif mode == 1:
         # detail
         in_paint_engine = "None"
         in_paint_ds = 0.5
+        in_paint_rf = 0
+    elif mode == 2:
+        in_paint_engine = "v2.6"
+        in_paint_ds = 1
         in_paint_rf = 0
 
     MIN_SEED = 0
