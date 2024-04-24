@@ -15,9 +15,11 @@ import jwt
 import math
 import azure
 import logging
+
 logging.getLogger('uvicorn').setLevel(logging.CRITICAL)
 logging.getLogger('uvicorn.access').setLevel(logging.CRITICAL)
 from logger_mgr import log
+
 JWT_SECRET = "dfasklfjsafusaiuqwnwenwq,melikjdlksa"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 length = 10
@@ -79,8 +81,16 @@ async def in_use():
     }}
 
 
+@app.get('/library_filter')
+async def get_library_filter(token: str = Depends(oauth2_scheme)):
+    return {"code": 200, "data": [{"name": "全部", "value": "all"},
+                                  {"name": "男性", "value": "male"},
+                                  {"name": "女性", "value": "female"},
+                                  {"name": "小孩", "value": "child"}]}
+
+
 @app.get("/library")
-async def get_face_library(page: int = 1, token: str = Depends(oauth2_scheme)):
+async def get_face_library(page: int = 1, filter:str = "all", token: str = Depends(oauth2_scheme)):
     if page < 1:
         return {"code": 500, "msg": "page Error Must >= 1"}
     else:
@@ -134,7 +144,9 @@ async def get_bg_conf(token: str = Depends(oauth2_scheme)):
 
 
 @app.post("/swap_bg_batch")
-async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str, Form()], custom_p: Annotated[str, Form()], is_static: Annotated[bool, Form()], token: str = Depends(oauth2_scheme)):
+async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str, Form()],
+                        custom_p: Annotated[str, Form()], is_static: Annotated[bool, Form()],
+                        token: str = Depends(oauth2_scheme)):
     log("swap_bg_batch")
     log(f"targets {targets}")
     log(f"select_p {select_p}")
@@ -173,7 +185,8 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
                 target["key"] = key
                 fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
                 keys.append(key)
-            thread = threading.Thread(target=batch, args=(targets_list, default_face, cnt, mode, prompts, False, client))
+            thread = threading.Thread(target=batch,
+                                      args=(targets_list, default_face, cnt, mode, prompts, False, client))
             thread.start()
             return {"code": 200, "data": {"keys": keys}}
         else:
@@ -181,7 +194,8 @@ async def swap_bg_batch(targets: Annotated[str, Form()], select_p: Annotated[str
 
 
 @app.post("/swap_face_batch")
-async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
+async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()],
+                          token: str = Depends(oauth2_scheme)):
     log("swap_face_batch")
     log(f"face_url {face_url}")
     log(f"targets {targets}")
@@ -212,7 +226,8 @@ async def swap_face_batch(face_url: Annotated[str, Form()], targets: Annotated[s
 
 
 @app.post("/detail_batch")
-async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()], detail_type: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
+async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str, Form()],
+                       detail_type: Annotated[str, Form()], token: str = Depends(oauth2_scheme)):
     log("detail_batch")
     log(f"face_url {face_url}")
     log(f"targets {targets}")
@@ -253,7 +268,8 @@ async def detail_batch(face_url: Annotated[str, Form()], targets: Annotated[str,
                 mode = 0
                 face_url = default_face
 
-            thread = threading.Thread(target=batch, args=(targets_list, face_url, cnt, mode, out_prompts, need_face, client))
+            thread = threading.Thread(target=batch,
+                                      args=(targets_list, face_url, cnt, mode, out_prompts, need_face, client))
             thread.start()
             return {"code": 200, "data": {"keys": keys}}
         else:
@@ -319,7 +335,7 @@ async def swap_face(paint_url: Annotated[str, Form()], mask_url: Annotated[str, 
         key = f'{timestamp_ms}{random_string}'
         fooocus.deal_cache[key] = {"finish": False, "progress": 0, "cnt": f"0/{cnt}"}
         thread = threading.Thread(target=fooocus.generate_in_paint_mode, args=(
-        prompts, base_model, refiner_model, 0.6, paint_url, mask_url, face_url, 0, cnt, key))
+            prompts, base_model, refiner_model, 0.6, paint_url, mask_url, face_url, 0, cnt, key))
         thread.start()
         return {"code": 200, "data": {"key": key, "cnt": cnt}}
     else:
