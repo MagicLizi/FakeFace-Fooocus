@@ -90,10 +90,10 @@ async def get_face_library(page: int = 1, token: str = Depends(oauth2_scheme)):
         start = (page - 1) * page_cnt
         end = start + page_cnt
         sub_list = rst_list[start:end]
-        for o in sub_list:
-            # print(o["url"])
-            o["url"] = f"{o['url']}!w300"
-            # print(o)
+        # for o in sub_list:
+        #     # print(o["url"])
+        #     o["url"] = f"{o['url']}!w300"
+        #     # print(o)
         return {"code": 200, "data": {"list": sub_list, "total_page": total_page}}
 
 
