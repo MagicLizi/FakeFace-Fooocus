@@ -95,11 +95,20 @@ async def get_face_library(page: int = 1, filter:str = "all", token: str = Depen
         return {"code": 500, "msg": "page Error Must >= 1"}
     else:
         rst_list = upyun_util.get_face_list("/fakeface/face")
+        filter_list = []
+        if filter == "all":
+            filter_list = rst_list
+        else:
+            for face in rst_list:
+                cfg = face_config[face["name"]]
+                if cfg["sort"] == filter:
+                    filter_list.append(face)
+
         page_cnt = 30
-        total_page = math.ceil(len(rst_list) / page_cnt)
+        total_page = math.ceil(len(filter_list) / page_cnt)
         start = (page - 1) * page_cnt
         end = start + page_cnt
-        sub_list = rst_list[start:end]
+        sub_list = filter_list[start:end]
         # for o in sub_list:
         #     # print(o["url"])
         #     o["url"] = f"{o['url']}!w300"
