@@ -215,11 +215,14 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         data = json.loads(file_content)
         img_path = []
         for k in data:
-            logger_mgr.log(k)
             url = upyun_util.upload(k)
             img_path.append(url)
             directory = os.path.dirname(k)
-            logger_mgr.log(directory)
+            try:
+                os.rmdir(directory)
+            except OSError as e:
+                print(f"Error: {directory} {e.strerror}")
+
         log(f"gen success: {img_path}")
         deal_cache[key] = {
             "finish": True,
