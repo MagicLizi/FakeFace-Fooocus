@@ -218,6 +218,8 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
             logger_mgr.log(k)
             url = upyun_util.upload(k)
             img_path.append(url)
+            directory = os.path.dirname(k)
+            logger_mgr.log(directory)
         log(f"gen success: {img_path}")
         deal_cache[key] = {
             "finish": True,
