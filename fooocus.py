@@ -3,6 +3,8 @@ import random
 import time
 import os
 import json
+
+import logger_mgr
 import upyun_util
 from bs4 import BeautifulSoup
 from logger_mgr import log
@@ -213,7 +215,7 @@ def generate(prompts, base_model, refiner, refiner_weight, paint_url, mask_url, 
         data = json.loads(file_content)
         img_path = []
         for k in data:
-            print(k)
+            logger_mgr.log(k)
             url = upyun_util.upload(k)
             img_path.append(url)
         log(f"gen success: {img_path}")
